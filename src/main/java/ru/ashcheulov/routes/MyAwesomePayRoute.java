@@ -14,6 +14,11 @@ public class MyAwesomePayRoute {
     @Inject
     IPaymentService paymentService;
 
+    /**
+     * Оплатить с помощью MyAwesomePay
+     *
+     * @return сообщние об облате
+     */
     @GET
     @Path("my-awesome-pay")
     @Produces(MediaType.TEXT_PLAIN)

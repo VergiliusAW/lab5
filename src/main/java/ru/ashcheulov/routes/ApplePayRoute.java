@@ -16,6 +16,11 @@ public class ApplePayRoute {
     @Apple
     IPaymentService paymentService;
 
+    /**
+     * Оплатить с помощью ApplePay
+     *
+     * @return сообщние об облате
+     */
     @GET
     @Path("apple-pay")
     @Produces(MediaType.TEXT_PLAIN)

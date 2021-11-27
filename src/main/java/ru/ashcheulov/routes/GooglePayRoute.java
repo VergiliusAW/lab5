@@ -16,6 +16,11 @@ public class GooglePayRoute {
     @Google
     IPaymentService paymentService;
 
+    /**
+     * Оплатить с помощью GooglePay
+     *
+     * @return сообщние об облате
+     */
     @GET
     @Path("google-pay")
     @Produces(MediaType.TEXT_PLAIN)

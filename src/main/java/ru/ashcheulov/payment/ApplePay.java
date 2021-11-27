@@ -7,6 +7,10 @@ import ru.ashcheulov.qualifiers.AppleProducer;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+/**
+ * Implementation for Apple pay payment service
+ * Для внедрения этой зависимости еобходимо использовать Qualifier @Apple
+ */
 @ApplicationScoped
 @Apple
 public class ApplePay implements IPaymentService {

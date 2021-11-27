@@ -7,6 +7,10 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Default;
 import javax.inject.Inject;
 
+/**
+ * Implementation for My awesome pay payment service
+ * Являетя реализацией по-умолчанию
+ */
 @ApplicationScoped
 @Default
 public class MyAwesomePay implements IPaymentService {

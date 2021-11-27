@@ -1,62 +1,125 @@
-# lab5 Project
+# Лабораторная работа 5
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
+## Задание
 
-If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .
+Реализовать внедрение зависимостей в контейнере [Quarkus](https://quarkus.io). Сделать свой интерфейс и две его реализации. Одна должна быть по-умолчанию, для второй должен быть отдельный [Qualifier](https://quarkus.io/guides/cdi-reference#qualified-injected-fields). Продемонстрировать работу обеих реализаций. Также реализовать метод, в котором вы сможете посмотреть все реализации того или иного bean'а.
 
-## Running the application in dev mode
+## Разработка
 
-You can run your application in dev mode that enables live coding using:
+### Структура проекта 
 
-```shell script
-./mvnw compile quarkus:dev
+```
+├── README.md
+├── mvnw
+├── mvnw.cmd
+├── pom.xml
+└── src
+    ├── main
+    │   ├── docker
+    │   │   ├── Dockerfile.jvm
+    │   │   ├── Dockerfile.legacy-jar
+    │   │   ├── Dockerfile.native
+    │   │   └── Dockerfile.native-distroless
+    │   ├── java
+    │   │   └── ru
+    │   │       └── ashcheulov
+    │   │           ├── commons
+    │   │           │   └── PaymentMessage.java
+    │   │           ├── enums
+    │   │           │   └── PayServiceType.java
+    │   │           ├── payment
+    │   │           │   ├── ApplePay.java
+    │   │           │   ├── GooglePay.java
+    │   │           │   ├── IPaymentService.java
+    │   │           │   └── MyAwesomePay.java
+    │   │           ├── producers
+    │   │           │   ├── ApplePayProducer.java
+    │   │           │   ├── GooglePayProducer.java
+    │   │           │   └── MyAwesomePayProducer.java
+    │   │           ├── qualifiers
+    │   │           │   ├── Apple.java
+    │   │           │   ├── AppleProducer.java
+    │   │           │   ├── AwesomeProducer.java
+    │   │           │   ├── Google.java
+    │   │           │   └── GoogleProducer.java
+    │   │           └── routes
+    │   │               ├── ApplePayRoute.java
+    │   │               ├── GooglePayRoute.java
+    │   │               ├── MyAwesomePayRoute.java
+    │   │               └── NonamePayRoute.java
+    │   └── resources
+    │       ├── META-INF
+    │       │   └── resources
+    │       │       └── index.html
+    │       └── application.properties
+    └── test
+        └── java
+            └── ru
+                └── ashcheulov
+                    ├── ExampleResourceTest.java
+                    └── NativeExampleResourceIT.java
+
 ```
 
-> **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at http://localhost:8080/q/dev/.
+## Результат разработки
 
-## Packaging and running the application
+В результате разработки был создан интерфейс [``IPaymentService``](src/main/java/ru/ashcheulov/payment/IPaymentService.java)
 
-The application can be packaged using:
-
-```shell script
-./mvnw package
+```java
+/**
+ * Payment service interface
+ */
+public interface IPaymentService {
+    /**
+     * @return payment result
+     */
+    String pay();
+}
 ```
 
-It produces the `quarkus-run.jar` file in the `target/quarkus-app/` directory. Be aware that it’s not an _über-jar_ as
-the dependencies are copied into the `target/quarkus-app/lib/` directory.
+И три его реализации:
+* [``ApplePay``](src/main/java/ru/ashcheulov/payment/ApplePay.java) с Qualifier [``Apple``](src/main/java/ru/ashcheulov/qualifiers/Apple.java)
+* [``GooglePay``](src/main/java/ru/ashcheulov/payment/GooglePay.java) с Qualifier [``Google``](src/main/java/ru/ashcheulov/qualifiers/Google.java)
+* [``MyAwesomePay``](src/main/java/ru/ashcheulov/payment/MyAwesomePay.java) без Qualifier является реализацией по-умолчанию
 
-The application is now runnable using `java -jar target/quarkus-app/quarkus-run.jar`.
+Для демонстрации работы всех реализаций были созданы следующие Rest endpoints:
+* [``ApplePayRoute``](src/main/java/ru/ashcheulov/routes/ApplePayRoute.java) с относительным адресом ``/api/apple-pay``
+* [``GooglePayRoute``](src/main/java/ru/ashcheulov/routes/GooglePayRoute.java) с относительным адресом ``/api/google-pay``
+* [``MyAwesomePayRoute``](src/main/java/ru/ashcheulov/routes/MyAwesomePayRoute.java) с относительным адресом ``/api/my-awesome-pay``
 
-If you want to build an _über-jar_, execute the following command:
+Для просмотра всех реализаций [``NonamePayRoute``](src/main/java/ru/ashcheulov/routes/NonamePayRoute.java)
+```java
+public class NonamePayRoute {
 
-```shell script
-./mvnw package -Dquarkus.package.type=uber-jar
+    @Inject
+    @Any
+    Instance<IPaymentService> paymentServices;
+
+    /**
+     * Предоставляет список доступных сервисов для оплаты (просмотр всех реализаций бина IPaymentService)
+     * @return сообщение включающее список доступные сервисы
+     */
+    @GET
+    @Path("noname-pay")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String pay() {
+        //code here...
+    }
+
+    /**
+     * Оплатить с помощью сервиса определённого типа
+     * @param type тип сервиса для оплаты
+     * @return сообщение об оплате с помощью соответствующего сервиса
+     */
+    @GET
+    @Path("noname-pay/{type}")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String pay(@PathParam("type") PayServiceType type) {
+        //code here...
+    }
+}
 ```
 
-The application, packaged as an _über-jar_, is now runnable using `java -jar target/*-runner.jar`.
+## Автор
 
-## Creating a native executable
-
-You can create a native executable using:
-
-```shell script
-./mvnw package -Pnative
-```
-
-Or, if you don't have GraalVM installed, you can run the native executable build in a container using:
-
-```shell script
-./mvnw package -Pnative -Dquarkus.native.container-build=true
-```
-
-You can then execute your native executable with: `./target/lab5-1.0-SNAPSHOT-runner`
-
-If you want to learn more about building native executables, please consult https://quarkus.io/guides/maven-tooling.
-
-## Provided Code
-
-### RESTEasy JAX-RS
-
-Easily start your RESTful Web Services
-
-[Related guide section...](https://quarkus.io/guides/getting-started#the-jax-rs-resources)
+[Ащеулов Михаил ПИМ-21](https://github.com/VergiliusAW)

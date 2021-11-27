@@ -7,6 +7,10 @@ import ru.ashcheulov.qualifiers.GoogleProducer;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+/**
+ * Implementation for Google pay payment service
+ * Для внедрения этой зависимости еобходимо использовать Qualifier @Google
+ */
 @ApplicationScoped
 @Google
 public class GooglePay implements IPaymentService {
