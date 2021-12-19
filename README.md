@@ -120,6 +120,8 @@ public class NonamePayRoute {
 }
 ```
 
-## Автор
+## Работа выполнена
 
 [Ащеулов Михаил ПИМ-21](https://github.com/VergiliusAW)
+
+[Кравцов Тимофей ПИМ-21](https://vk.com/timofeykrav)
